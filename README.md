@@ -7,6 +7,11 @@ I made it totally *ad-hoc* for my personal server so it doesn't support multiple
 # Contributors
 - **[SavageCore](https://github.com/SavageCore)** - Implemented support for requesting YouTube playlists, setting the current song in the "Now Playing" status in Discord, and the !setavatar and !setusername commands. Thanks!
 
+# New commands
+- **!volume <volume>** - Changes the volume. Use values from 1 to 100, although over 100 will work if you enjoy gain distortion.
+- **!reset** - Resets the bot.
+
+
 # Available commands
 - **!request <video/playlist/alias>** - Adds a YouTube video or playlist to the queue. You can provide the full URL, just the video ID, full playlist URL or an alias.
 - **!search <query>** - Searches for a video on YouTube and adds it to the queue. Requires a [YouTube API key](#obtaining-a-youtube-api-key).
@@ -35,17 +40,19 @@ Next, register a new [Discord application](https://discordapp.com/developers/app
 
 It's time to make the bot join your server: replace your Client ID on this URL and navigate to it `https://discordapp.com/oauth2/authorize?&client_id=YOUR_CLIENT_ID_HERE&scope=bot&permissions=0`. Select the server you want the bot to join and click Authorize. This step requires that you have manage permissions on the server, otherwise it will not appear in the server list you'll be prompted with. Your bot should now appear as *Offline* in your server.
 
-Finally, let's bring it to life! It's as simple as executing this script:
+Finally, let's bring it to life! It's as simple as executing this script...
+
+NOTE: all parameters can be passed as process environment variables. Use the same names as the variables here.
 ```js
 var bot = require("discord-music-bot");
 
-var serverName = "Your server name here";
-var textChannelName = "Your text channel name here (without #)";
-var voiceChannelName = "Your voice channel name here";
-var aliasesFile = "A file the bot will use to store your aliases";
-var botToken = "Your bot token here";
+var server_name = "Your server name here"; 
+var text_channel_name = "Your text channel name here (without #)";
+var voice_channel_name = "Your voice channel name here";
+var aliases_path = "A file the bot will use to store your aliases";
+var bot_token = "Your bot token here";
 
-bot.run(serverName, textChannelName, voiceChannelName, aliasesFile, botToken);
+bot.run(server_name, text_channel_name, voice_channel_name, aliases_path, bot_token);
 ```
 The aliases file parameter can be just a filename or a path to a file. If it does not exist, it will be generated. If you provide a filename, it will be generated in the same folder as the previous script. Any filename will do.
 
