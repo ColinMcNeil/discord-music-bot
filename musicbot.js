@@ -36,6 +36,7 @@ var voice_handler = null;
 var text_channel = null;
 
 var yt_api_key = null;
+var volume = .05
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +74,29 @@ var commands = [
 			} else {
 				message.reply("Playback is already running");
 			}
+		}
+	},
+	{
+		command: "volume",
+		description: "Changes the volume of the bot (0-100) (ex: !volume 50)",
+		parameters: ['volume'],
+		execute: function (message, params) {
+			try { volume = ParseFloat(params.volume) / 100 }
+			catch (error) {
+				message.reply('Error changing volume. Usage: ' + this.description)
+				console.log(error)
+			}
+			
+		}
+	},
+	{
+		command: "reset",
+		description: "Resets bot in case of error state.",
+		parameters: [],
+		execute: function (message, params) {
+			message.reply('Restarting Voice Connection')
+			voice_handler.disconnect()
+			voice_channel.join().then(connection => { voice_connection = connection; }).catch(console.error);
 		}
 	},
 
@@ -506,7 +530,9 @@ function get_video_id(string) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-exports.run = function(server_name, text_channel_name, voice_channel_name, aliases_path, token) {
+exports.run = function (server_name = process.env.server_name, text_channel_name = process.env.text_channel_name,
+	voice_channel_name = process.env.voice_channel_name, aliases_path = process.env.aliases_path,
+	token = process.env.bot_token) {
 
 	aliases_file_path = aliases_path;
 
