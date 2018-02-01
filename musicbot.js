@@ -32,10 +32,12 @@ var queue = [];
 var aliases = {};
 
 var voice_connection = null;
+var voice_channel = null;
 var voice_handler = null;
 var text_channel = null;
 
 var yt_api_key = null;
+var volume = .05
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +75,37 @@ var commands = [
 			} else {
 				message.reply("Playback is already running");
 			}
+		}
+	},
+	{
+		command: "volume",
+		description: "Changes the volume of the bot (0-100) (ex: !volume 50)",
+		parameters: ['volume'],
+		execute: function (message, params) {
+
+			try { volume = parseFloat(params[1]) / 100 }
+			catch (error) {
+				message.reply('Error changing volume. Usage: ' + this.description)
+				console.log(error)
+				return
+			}
+			message.reply(`Setting volume to ${params[1]}%`)
+			console.log(volume)
+			if (voice_handler) { voice_handler.setVolume(volume) }
+		}
+	},
+	{
+		command: "reset",
+		description: "Resets bot in case of error state.",
+		parameters: [],
+		execute: function (message, params) {
+			message.reply('Restarting Voice Connection')
+			if (voice_connection) {
+				voice_connection.disconnect()
+				voice_channel.join().then(connection => { voice_connection = connection; }).catch(console.error);
+			}
+			
+			
 		}
 	},
 
@@ -370,7 +403,7 @@ bot.on("message", message => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 function add_to_queue(video, message, mute = false) {
-
+	
 	if(aliases.hasOwnProperty(video.toLowerCase())) {
 		video = aliases[video.toLowerCase()];
 	}
@@ -384,7 +417,9 @@ function add_to_queue(video, message, mute = false) {
 		} else {
 			queue.push({title: info["title"], id: video_id, user: message.author.username});
 			if (!mute) {
-				message.reply('"' + info["title"] + '" has been added to the queue.');
+				//console.log(info)
+				var seconds = info.length_seconds
+				message.reply('"' + info["title"] + `" has been added to the queue. (Length: ${parseInt(seconds/60)}:${seconds%60})`);
 			}
 			if(!stopped && !is_bot_playing() && queue.length === 1) {
 				play_next_song();
@@ -412,7 +447,7 @@ function play_next_song() {
 
 	var audio_stream = ytdl("https://www.youtube.com/watch?v=" + video_id);
 	voice_handler = voice_connection.playStream(audio_stream);
-
+	voice_handler.setVolume(volume)
 	voice_handler.once("end", reason => {
 		voice_handler = null;
 		bot.user.setGame();
@@ -506,7 +541,9 @@ function get_video_id(string) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-exports.run = function(server_name, text_channel_name, voice_channel_name, aliases_path, token) {
+exports.run = function (server_name = process.env.server_name, text_channel_name = process.env.text_channel_name,
+	voice_channel_name = process.env.voice_channel_name, aliases_path = process.env.aliases_path,
+	token = process.env.bot_token) {
 
 	aliases_file_path = aliases_path;
 
@@ -514,7 +551,7 @@ exports.run = function(server_name, text_channel_name, voice_channel_name, alias
 		var server = bot.guilds.find("name", server_name);
 		if(server === null) throw "Couldn't find server '" + server_name + "'";
 
-		var voice_channel = server.channels.find(chn => chn.name === voice_channel_name && chn.type === "voice"); //The voice channel the bot will connect to
+		voice_channel = server.channels.find(chn => chn.name === voice_channel_name && chn.type === "voice"); //The voice channel the bot will connect to
 		if(voice_channel === null) throw "Couldn't find voice channel '" + voice_channel_name + "' in server '" + server_name + "'";
 		
 		text_channel = server.channels.find(chn => chn.name === text_channel_name && chn.type === "text"); //The text channel the bot will use to announce stuff
