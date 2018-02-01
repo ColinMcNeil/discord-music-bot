@@ -82,7 +82,6 @@ var commands = [
 		description: "Changes the volume of the bot (0-100) (ex: !volume 50)",
 		parameters: ['volume'],
 		execute: function (message, params) {
-
 			try { volume = parseFloat(params[1]) / 100 }
 			catch (error) {
 				message.reply('Error changing volume. Usage: ' + this.description)
@@ -92,6 +91,8 @@ var commands = [
 			message.reply(`Setting volume to ${params[1]}%`)
 			console.log(volume)
 			if (voice_handler) { voice_handler.setVolume(volume) }
+
+
 		}
 	},
 	{
@@ -104,8 +105,7 @@ var commands = [
 				voice_connection.disconnect()
 				voice_channel.join().then(connection => { voice_connection = connection; }).catch(console.error);
 			}
-			
-			
+
 		}
 	},
 
