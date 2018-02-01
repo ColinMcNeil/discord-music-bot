@@ -2,6 +2,8 @@
 
 A Node.JS Discord bot that takes song requests from videos on YouTube, queues them and plays the audio of said videos on a voice channel.
 
+**Forked by Colin McNeil. See changes below.**
+
 I made it totally *ad-hoc* for my personal server so it doesn't support multiple servers for a single instance or anything like that, but it can be customised very easily to make it work on any server you want.
 
 # Contributors
@@ -11,6 +13,9 @@ I made it totally *ad-hoc* for my personal server so it doesn't support multiple
 - **!volume <volume>** - Changes the volume. Use values from 1 to 100, although over 100 will work if you enjoy gain distortion.
 - **!reset** - Resets the bot.
 
+# General changes
+- Track length now displayed when the bot confirms song requests.
+- Environment variables can be used instead of hard-coded variables.
 
 # Available commands
 - **!request <video/playlist/alias>** - Adds a YouTube video or playlist to the queue. You can provide the full URL, just the video ID, full playlist URL or an alias.
